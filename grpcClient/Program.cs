@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Net.Client;
 
@@ -18,6 +19,8 @@ namespace grpcClient
             Console.WriteLine("Client Stream Service");
             await CallClientStreamService();
 
+            Console.WriteLine("Bi-Directional Stream Service");
+            await CallBiDirectionalStreamService();
         }
 
         static void CallUnaryService()
@@ -114,6 +117,33 @@ namespace grpcClient
         
                 var response = await request;
                 Console.WriteLine($"Result : {response.Result}");
+            }
+        }
+
+        static async Task CallBiDirectionalStreamService()
+        {
+            using(var channel = GrpcChannel.ForAddress(_url))
+            {
+                var client = new BiDirectionalStream.BiDirectionalStreamClient(channel);
+                var reply = client.Add();
+
+                await reply.RequestStream.WriteAsync(new BiDirectionalStreamRequest { Number1 = 3, Number2 = 44});
+                await reply.ResponseStream.MoveNext(new CancellationToken());
+                Console.WriteLine($"Result: {reply.ResponseStream.Current.Result}");
+
+                await reply.RequestStream.WriteAsync(new BiDirectionalStreamRequest { Number1 = 11, Number2 = 32});
+                await reply.ResponseStream.MoveNext(new CancellationToken());
+                Console.WriteLine($"Result: {reply.ResponseStream.Current.Result}");
+
+                await reply.RequestStream.WriteAsync(new BiDirectionalStreamRequest { Number1 = 23, Number2 = 12});
+                await reply.ResponseStream.MoveNext(new CancellationToken());
+                Console.WriteLine($"Result: {reply.ResponseStream.Current.Result}");
+
+                await reply.RequestStream.WriteAsync(new BiDirectionalStreamRequest { Number1 = 21, Number2 = 9});
+                await reply.ResponseStream.MoveNext(new CancellationToken());
+                Console.WriteLine($"Result: {reply.ResponseStream.Current.Result}");
+
+                await reply.RequestStream.CompleteAsync();
             }
         }
     }

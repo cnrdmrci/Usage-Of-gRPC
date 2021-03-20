@@ -34,6 +34,7 @@ namespace grpcServer
                 endpoints.MapGrpcService<UnaryService>();
                 endpoints.MapGrpcService<ServerStreamService>();
                 endpoints.MapGrpcService<ClientStreamService>();
+                endpoints.MapGrpcService<BiDirectionalStreamService>();
             });
         }
     }
