@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Grpc.Core;
 using Grpc.Net.Client;
 
 namespace grpcClient
@@ -21,6 +22,9 @@ namespace grpcClient
 
             Console.WriteLine("Bi-Directional Stream Service");
             await CallBiDirectionalStreamService();
+
+            Console.WriteLine("Unary With Headers Service");
+            CallUnaryWithHeadersService();
         }
 
         static void CallUnaryService()
@@ -144,6 +148,24 @@ namespace grpcClient
                 Console.WriteLine($"Result: {reply.ResponseStream.Current.Result}");
 
                 await reply.RequestStream.CompleteAsync();
+            }
+        }
+
+        static void CallUnaryWithHeadersService()
+        {
+            var headers = new Metadata();
+            headers.Add("Authorization", "Bearer ...");
+
+            using(var channel = GrpcChannel.ForAddress(_url))
+            {
+                var client = new UnaryWithHeaders.UnaryWithHeadersClient(channel);
+
+                int number1 = 5;
+                int number2 = 8;
+                Console.WriteLine($"Number1: {number1} , Number2: {number2}");
+
+                var addReply = client.Add(new UnaryWithHeadersRequest(){Number1 = 5, Number2 = 8},headers);
+                Console.WriteLine($"Add Result: {addReply.Result}");
             }
         }
     }
