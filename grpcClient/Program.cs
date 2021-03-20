@@ -15,6 +15,9 @@ namespace grpcClient
             Console.WriteLine("Server Stream Service");
             await CallServerStreamService();
 
+            Console.WriteLine("Client Stream Service");
+            await CallClientStreamService();
+
         }
 
         static void CallUnaryService()
@@ -88,6 +91,29 @@ namespace grpcClient
                     while (await subReply.ResponseStream.MoveNext(new System.Threading.CancellationToken()))
                         Console.WriteLine($"Sub result : {subReply.ResponseStream.Current.Result}");
                 });
+            }
+        }
+    
+        static async Task CallClientStreamService()
+        {
+            using(var channel = GrpcChannel.ForAddress(_url))
+            {
+                var client = new ClientStream.ClientStreamClient(channel);
+
+                var request = client.Add();
+
+                await Task.Run(async () =>
+                {
+                    for (var i = 0; i < 5; i++)
+                    {
+                        await request.RequestStream.WriteAsync(new ClientStreamRequest { Number = i });
+                    }
+                });
+        
+                await request.RequestStream.CompleteAsync();
+        
+                var response = await request;
+                Console.WriteLine($"Result : {response.Result}");
             }
         }
     }

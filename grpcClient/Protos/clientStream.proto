@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "grpcClient";
+
+package clientStream;
+
+service ClientStream {
+  rpc Add (stream ClientStreamRequest) returns (ClientStreamReply);
+}
+
+message ClientStreamRequest {
+  int32 number = 1;
+}
+
+message ClientStreamReply {
+  int32 result = 1;
+}
