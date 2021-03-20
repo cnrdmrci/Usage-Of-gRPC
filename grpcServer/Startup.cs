@@ -32,6 +32,7 @@ namespace grpcServer
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<UnaryService>();
+                endpoints.MapGrpcService<ServerStreamService>();
             });
         }
     }

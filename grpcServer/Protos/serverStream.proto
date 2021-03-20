@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option csharp_namespace = "grpcServer";
+
+package serverStream;
+
+service ServerStream {
+  rpc Add (ServerStremRequest) returns (stream ServerStremReply);
+  rpc Sub (ServerStremRequest) returns (stream ServerStremReply);
+}
+
+message ServerStremRequest {
+  repeated Numbers NumberList = 1;
+}
+
+message ServerStremReply {
+  int32 result = 1;
+}
+
+message Numbers {
+  int32 number1 = 1;
+  int32 number2 = 2;
+}
